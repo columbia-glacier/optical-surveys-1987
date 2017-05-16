@@ -26,7 +26,7 @@
           {
             "name": "marker",
             "type": "integer",
-            "description": "Marker identifier and distance downglacier from the divide (km).",
+            "description": "Marker identifier and distance downglacier from the divide (km)."
           },
           {
             "name": "t",
