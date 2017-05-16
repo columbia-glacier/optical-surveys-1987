@@ -1,6 +1,6 @@
 # ---- Install missing dependencies ----
 
-packages <- c("vec2dtransf")
+packages <- c("xml2", "vec2dtransf")
 if (length(setdiff(packages, rownames(installed.packages()))) > 0) {
   install.packages(setdiff(packages, rownames(installed.packages())))
 }
@@ -96,9 +96,29 @@ apply_transformation <- function(xy, transform) {
   return(cbind(x, y))
 }
 
+#' Convert 1987 Julian Day to UTC Date Time
+#'
+#' Meier and others 1994 (sources/meier-and-others-1994.pdf), page 2:
+#' "Columbia Glacier was studied during the period July 5 to August 31, 1987 (J.D. 186 to 243)"
+#' It is further assumed, from ablation rate in Figure 5, that times are given in local time.
+#' 
+#' The offset between local time and UTC was determined from \url{https://www.timeanddate.com/time/change/usa/anchorage?year=1987}.
+#'
+#' @param julian_day Julian day of 1987 in AKDT (UTC-8).
+#' @return ISO 8601 date time in UTC.
+#' @examples
+#' julian_day_to_utc_datetime(186) == "1987-07-05T08:00:00Z"
+#' julian_day_to_utc_datetime(243) == "1987-08-31T08:00:00Z"
+julian_day_to_utc_datetime <- function(julian_day) {
+  julian_day_utc <- julian_day + 8 / 24
+  origin <- strptime("1986-12-31 00:00:00", "%Y-%m-%d %H:%M:%S", tz = "UTC")
+  datetime <- format(as.POSIXlt(julian_day_utc * (60 * 60 * 24), tz = "UTC", origin = origin), "%Y-%m-%dT%H:%M:%SZ")
+  return(datetime)
+}
+
 # ---- Load SVG ----
 
-filename <- "sources/krimmel-vaughn-1987-figure-8.svg"
+filename <- "sources/meier-others-1994-figure-4.svg"
 xml <- xml2::read_html(filename)
 svg <- xml2::as_list(xml)$body$svg
 
@@ -122,8 +142,13 @@ for (i_group in seq_along(svg)) {
     }
     # Compute coordinate transformation
     # (format: 'x'[\\-0-9\\.]+'y'[\\-0-9\\.]+)
-    fig_x <- as.numeric(gsub(".*x([\\-0-9\\.]+).*", "\\1", names(layers$axes), perl = TRUE))
-    fig_y <- as.numeric(gsub(".*y([\\-0-9\\.]+).*", "\\1", names(layers$axes), perl = TRUE))
+    is_axes <- grepl("^axes", names(layers))
+    if (sum(is_axes) != 1) {
+      stop("One axes layer is required in each group.")
+    }
+    axes <- names(layers)[is_axes]
+    fig_x <- as.numeric(gsub(".*x([\\-0-9\\.]+).*", "\\1", names(layers[[axes]]), perl = TRUE))
+    fig_y <- as.numeric(gsub(".*y([\\-0-9\\.]+).*", "\\1", names(layers[[axes]]), perl = TRUE))
     img_xy <- do.call("rbind", layers$axes)
     if (nrow(img_xy) > 2) {
       transform <- vec2dtransf::AffineTransformation(data.frame(img_xy, fig_x, fig_y))  
@@ -131,10 +156,21 @@ for (i_group in seq_along(svg)) {
       transform <- vec2dtransf::SimilarityTransformation(data.frame(img_xy, fig_x, fig_y))  
     }
     # Apply transformation
-    newdata <- lapply(layers$data, apply_transformation, transform)
-    # Save results
-    results[[group]] <- newdata
+    for (name in names(layers)[!is_axes]) {
+      results[[group]][[name]] <- lapply(layers[[name]], apply_transformation, transform)
+    }
   }
+}
+
+# ---- Merge figure panels ----
+
+names(results[[1]]) <- gsub("\\-[0-9]+$", "", names(results[[1]]))
+names(results[[2]]) <- gsub("\\-[0-9]+$", "", names(results[[2]]))
+keys <- unique(c(names(results[[1]]), names(results[[2]])))
+results <- setNames(mapply(c, results[[1]][keys], results[[2]][keys]), keys)
+for (i in seq_along(results)) {
+  start_times <- sapply(results[[i]], "[", i = 1, j = 1)
+  results[[i]] <- results[[i]][order(start_times)]
 }
 
 # ---- Plot Results ----
@@ -157,48 +193,19 @@ for (i_group in seq_along(results)) {
   }
 }
 
-# ---- Check Time Zone ----
-
-# https://www.timeanddate.com/time/zone/usa/valdez?year=1986
-utc_local <- 9 # hours (AKST)
-origin <- as.POSIXct("1985-12-31 00:00:00", format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
-
-# Valdez tide data (UTC reference)
-valdez <- read.csv("https://raw.githubusercontent.com/ezwelty/cg-data/master/noaa-coops/data/valdez.csv", stringsAsFactors = FALSE)
-valdez$t <- as.POSIXct(valdez$t, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
-
-# Valdez tide data (figure)
-figure <- as.data.frame(do.call("rbind", results$tide))
-figure[, 1] <- as.POSIXct(figure[, 1] * 24 * 60 * 60 + utc_local * 60 * 60, origin = origin, tz = "UTC")
-
-# Plot together
-ind <- valdez$t >= min(figure[, 1]) & valdez$t <= max(figure[, 1])
-plot(valdez$t[ind], valdez$hourly_height[ind], type = "l", col = 'black')
-lines(figure[, 1], figure[, 2], col = 'red')
-
 # ---- Format and save results ----
 
-is_saved <- !names(results) %in% "tide"
-for (i in which(is_saved)) {
+is_saved <- seq_along(results)
+markers <- list()
+for (i in is_saved) {
+  marker <- as.integer(gsub("^[^\\-]*\\-", "", names(results)[i]))
   sequences <- lapply(seq_along(results[[i]]), function(j) {
     cbind(results[[i]][[j]], j)
   })
-  df <- as.data.frame(do.call("rbind", sequences))
-  names(df) <- c("t", "value", "sequence")
-  df <- df[order(df$t), ]
-  df$t <- format(as.POSIXct(df$t * 24 * 60 * 60 + utc_local * 60 * 60, origin = origin, tz = "UTC"), "%Y-%m-%dT%H:%M:%SZ")
-  if (names(results)[i] == "precipitation") {
-    notes <- names(results[[i]])
-    notes[notes == "NULL"] <- NA
-    notes <- gsub("_x7E_", "~", notes)
-    notes <- gsub("_", " ", notes)
-    df <- data.frame(t_begin = df$t[seq(1, nrow(df), 2)], t_end = df$t[seq(2, nrow(df), 2)], notes = notes)
-  }
-  write.csv(df, file.path("data", paste0(names(results)[i], ".csv")), na = "", row.names = FALSE, quote = FALSE)
+  markers[[i]] <- cbind(marker, do.call("rbind", sequences))
 }
-
-# ---- Station metadata ----
-
-# Estimated from point "H" in Figure 1
-df <- data.frame(lat = 60.988913, lng = -147.035686) # WGS84 decimal degrees
-write.csv(df, file.path("data", "station.csv"), na = "", row.names = FALSE, quote = FALSE)
+df <- as.data.frame(do.call("rbind", markers), row.names = "")
+names(df) <- c("marker", "t", "value", "sequence")
+df <- df[order(df$marker, df$t), ]
+df$t <- julian_day_to_utc_datetime(df$t)
+write.csv(df, file.path("data", "velocity.csv"), na = "", row.names = FALSE, quote = FALSE)
