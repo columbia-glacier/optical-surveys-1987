@@ -1,7 +1,7 @@
 {
-  "name": "optical-surveys-1986",
-  "title": "Optical Surveys (1986)",
-  "description": "Velocity of a reflector 1.8 km from the terminus and meteorological observations from a station on nearby Heather Island.",
+  "name": "optical-surveys-1987",
+  "title": "Optical Surveys (1987)",
+  "description": "Velocities of targets on the glacier surface at 52, 53, 54, 55, and 59 km from the divide along the longitudinal centerline.",
   "version": "0.1.0",
   "contributors": [
     {
@@ -18,30 +18,16 @@
   ],
   "resources": [
     {
-      "name": "station",
-      "title": "Station Metadata",
-      "path": "data/station.csv",
-      "schema": {
-        "fields": [
-          {
-            "name": "lat",
-            "type": "number",
-            "description": "Latitude in decimal degrees (WGS84, EPSG:4326)."
-          },
-          {
-            "name": "lng",
-            "type": "number",
-            "description": "Longitude in decimal degrees (WGS84, EPSG:4326)."
-          }
-        ]
-      }
-    },
-    {
       "name": "velocity",
       "title": "Marker Velocity",
       "path": "data/velocity.csv",
       "schema": {
         "fields": [
+          {
+            "name": "marker",
+            "type": "integer",
+            "description": "Marker identifier and distance downglacier from the divide (km).",
+          },
           {
             "name": "t",
             "type": "datetime",
@@ -57,82 +43,6 @@
             "name": "sequence",
             "type": "integer",
             "description": "Sequence number from figure tracing. Observations are 'continuous' between times of the same sequence."
-          }
-        ]
-      }
-    },
-    {
-      "name": "temperature",
-      "title": "Air Temperature",
-      "path": "data/temperature.csv",
-      "schema": {
-        "fields": [
-          {
-            "name": "t",
-            "type": "datetime",
-            "description": "Date and time (UTC).",
-            "format": "YYYY-MM-DD'T'hh:mm:ss'Z'"
-          },
-          {
-            "name": "value",
-            "type": "number",
-            "description": "Air temperature (°C)."
-          },
-          {
-            "name": "sequence",
-            "type": "integer",
-            "description": "Sequence number from figure tracing. Observations are 'continuous' between times of the same sequence."
-          }
-        ]
-      }
-    },
-    {
-      "name": "pressure",
-      "title": "Atmospheric Pressure",
-      "path": "data/pressure.csv",
-      "schema": {
-        "fields": [
-          {
-            "name": "t",
-            "type": "datetime",
-            "description": "Date and time (UTC).",
-            "format": "YYYY-MM-DD'T'hh:mm:ss'Z'"
-          },
-          {
-            "name": "value",
-            "type": "number",
-            "description": "Atmospheric pressure (mbar)."
-          },
-          {
-            "name": "sequence",
-            "type": "integer",
-            "description": "Sequence number from figure tracing. Observations are 'continuous' between times of the same sequence."
-          }
-        ]
-      }
-    },
-    {
-      "name": "precipitation",
-      "title": "Precipitation",
-      "path": "data/precipitation.csv",
-      "schema": {
-        "fields": [
-          {
-            "name": "t_begin",
-            "type": "datetime",
-            "description": "Date and time (UTC) of precipitation onset.",
-            "format": "YYYY-MM-DD'T'hh:mm:ss'Z'"
-          },
-          {
-            "name": "t_end",
-            "type": "datetime",
-            "description": "Date and time (UTC) of precipitation end.",
-            "format": "YYYY-MM-DD'T'hh:mm:ss'Z'"
-          },
-          {
-            "name": "notes",
-            "type": "string",
-            "description": "Description of precipitation event."
           }
         ]
       }
