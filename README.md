@@ -4,12 +4,11 @@ Preview this [Data Package](http://specs.frictionlessdata.io/data-packages/) usi
 
 ## Citation
 
-> Mark Meier, Scott Lundstrom, Dan Stone, Barclay Kamb, Hermann Engelhardt, Neil Humphrey, William W. Dunlap, Mark Fahnestock, Robert M. Krimmel, Roy Walters (1994). Mechanical and hydrologic basis for the rapid motion of a large tidewater glacier 1. Observations. Journal of Geophysical Research, 99(B8), PP. 15,219–15,229. doi:[199410.1029/94JB00237](https://doi.org/199410.1029/94JB00237)
+> Mark Meier, Scott Lundstrom, Dan Stone, Barclay Kamb, Hermann Engelhardt, Neil Humphrey, William W. Dunlap, Mark Fahnestock, Robert M. Krimmel, Roy Walters (1994). Mechanical and hydrologic basis for the rapid motion of a large tidewater glacier 1. Observations. Journal of Geophysical Research, 99(B8), pages 15,219-15,229, doi:[199410.1029/94JB00237](https://doi.org/199410.1029/94JB00237).
 
 Observational Program
 
-> Columbia Glacier was studied during the period July 5 to August 31, 1987 (J.D. 186 to 243); all dates are given in Julian days (J.D.). Frequent observations of glacier motion
-were made at five points on the glacier surface over the longitudinal interval from km 52 to 59 (Figure 2). [...] Weather permitting, these observations could detect fluctuations in motion on time scales of as short as an hour or less. Frequent observations of basal water pressure were made in boreholes at km 52 and km 59. Meteorological variables and ablation of the ice surface were recorded as measures of the input of water to the glacier, and water output at an accessible glacier outflow stream was estimated from stream gauge recordings.
+> Columbia Glacier was studied during the period July 5 to August 31, 1987 (J.D. 186 to 243); all dates are given in Julian days (J.D.). Frequent observations of glacier motion were made at five points on the glacier surface over the longitudinal interval from km 52 to 59 (Figure 2). [...] Weather permitting, these observations could detect fluctuations in motion on time scales of as short as an hour or less. Frequent observations of basal water pressure were made in boreholes at km 52 and km 59. Meteorological variables and ablation of the ice surface were recorded as measures of the input of water to the glacier, and water output at an accessible glacier outflow stream was estimated from stream gauge recordings.
 
 Flow velocities (EDM)
 
@@ -22,8 +21,6 @@ Flow velocities (theodolite)
 ## To Do
 
 - Scan EDM measurements (currently at INSTAAR).
-- Ask Mark Fahnestock for data used in his thesis ([Fahnestock 1991](http://thesis.library.caltech.edu/2920/)).
-- (as needed) Extract ice velocities (meier-others-1994, Figure 4).
 - (as needed) Extract rainfall, wind speed, temperature, ablation rate, river discharge, lake filling rate, and water level (meier-others-1994, Figure 5).
-- (as needed) Extract water level in boreholes (meier-others-1994, Figure 7).s
+- (as needed) Extract water level in boreholes (meier-others-1994, Figure 7).
 - (as needed) Process original data.
