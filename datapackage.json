@@ -5,14 +5,14 @@
   "version": "0.1.0",
   "contributors": [
     {
-      "name": "Ethan Welty",
+      "title": "Ethan Welty",
       "email": "ethan.welty@gmail.com",
-      "roles": "Assembled and published the datapackage."
+      "role": "author"
     }
   ],
   "sources": [
     {
-      "name": "Original data, scripts, and documentation",
+      "title": "Original data, scripts, and documentation",
       "path": "sources/"
     }
   ],
@@ -26,18 +26,20 @@
           {
             "name": "marker",
             "type": "integer",
-            "description": "Marker identifier and distance downglacier from the divide (km)."
+            "description": "Marker identifier and distance downglacier from the divide.",
+            "unit": "km"
           },
           {
             "name": "t",
             "type": "datetime",
             "description": "Date and time (UTC).",
-            "format": "YYYY-MM-DD'T'hh:mm:ss'Z'"
+            "format": "%Y-%m-%dT%H:%M:%SZ"
           },
           {
             "name": "value",
             "type": "number",
-            "description": "Velocity (m / day)."
+            "description": "Velocity.",
+            "unit": "m d-1"
           },
           {
             "name": "sequence",
